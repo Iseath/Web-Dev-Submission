@@ -39,7 +39,7 @@
 					}
 					break;
 				case 'i':
-					Matter.Body.scale(player, 1.02, 1.02);
+					door.vertices[2].y+=1;
 					break;
 				}
 				switch(player.velocity)
@@ -75,7 +75,7 @@
 				}
 			});
 			renderer.mouse = mouse;
-			let door = Matter.Bodies.rectangle(950,400,1,600,{isStatic: true, render: {fillStyle: 'white', visible: false}});
+			let door = Matter.Bodies.rectangle(950,400,1,1,{isStatic: true, render: {fillStyle: 'white', visible: false}});
 
 			let button = Matter.Bodies.rectangle(1816,905,60,30,{isStatic: true, render: {fillStyle: 'red'}});
 
@@ -88,9 +88,9 @@
 					renderer.options.wireframes = false;
 					door.render.visible = true;
 				}
-				if (door.render.visible == true && door.vertices[1].x < 1200) 
+				if (door.render.visible == true && door.vertices[1].x < 1200 && door.vertices[3].y < 800) 
 				{
-					Matter.Body.scale(door,1.2,1);
+					Matter.Body.scale(door,1.2,1.2);
 
 
 				}
