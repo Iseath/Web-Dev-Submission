@@ -65,7 +65,7 @@
 			renderer.canvas.width = 1912;
 			renderer.canvas.height =935;
 
-			let player = Matter.Bodies.circle(0,450,40,{id: 1, mass:10});
+			let player = Matter.Bodies.circle(0,450,40,{id: 1, mass:10, collisionFilter: {group: -1}});
 			let ground = Matter.Bodies.rectangle(400,950,3050,60,{isStatic: true});
 			let mouse = Matter.Mouse.create(renderer.canvas);
 			let mouseConstraint = Matter.MouseConstraint.create(engine,{
@@ -75,7 +75,11 @@
 				}
 			});
 			renderer.mouse = mouse;
-			let door = Matter.Bodies.rectangle(950,400,1,1,{isStatic: true, render: {fillStyle: 'white', visible: false}});
+			let door = Matter.Bodies.rectangle(950,400,1,1,{isStatic: true, render: {
+				fillStyle: 'rgba(255, 255, 255, 0.90)', 
+				visible: false},
+				opacity: 0, 
+				collisionFilter: {group:-1}});
 
 			let button = Matter.Bodies.rectangle(1816,905,60,30,{isStatic: true, render: {fillStyle: 'red'}});
 
@@ -91,7 +95,6 @@
 				if (door.render.visible == true && door.vertices[1].x < 1200 && door.vertices[3].y < 800) 
 				{
 					Matter.Body.scale(door,1.2,1.2);
-
 
 				}
 			});
