@@ -76,12 +76,14 @@
 			});
 			renderer.mouse = mouse;
 			let door = Matter.Bodies.rectangle(950,400,1,1,{isStatic: true, render: {
-				fillStyle: 'rgba(255, 255, 255, 0.90)', 
+				fillStyle: 'rgba(255, 255, 255, 0.10)', 
 				visible: false},
 				opacity: 0, 
 				collisionFilter: {group:-1}});
 
 			let button = Matter.Bodies.rectangle(1816,905,60,30,{isStatic: true, render: {fillStyle: 'red'}});
+
+			var portalActivation = false;
 
 			Matter.Events.on(engine, 'afterUpdate', function()
 			{
@@ -96,6 +98,35 @@
 				{
 					Matter.Body.scale(door,1.2,1.2);
 
+				}
+				if (Matter.Vertices.contains(door.vertices, player.position)) 
+				{
+					player.render.fillStyle = '#fefbee';
+					xOffset = door.position.x - player.position.x;
+					yOffset = door.position.y - player.position.y;
+					distance = Matter.Vector.magnitude(Matter.Vector.create(xOffset,yOffset));
+					engine.gravity.x = xOffset/2500;
+					engine.gravity.y = yOffset/3000;
+					if (distance <= 10) 
+					{
+						door.render.fillStyle = 'rgba(255, 255, 255, 1)';
+						Matter.Composite.remove(engine.world, ground);
+						Matter.Body.scale(door, 1.05, 1.05);
+						document.body.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+						player.render.fillStyle = "Black";
+						while (door.vertices[1].x >= 1912 && portalActivation == false) 
+						{
+							window.location.href = "about.html";
+							portalActivation = true;
+							break;
+						}
+					}
+				}
+				else
+				{
+					player.render.fillStyle = '#f5d259';
+					engine.gravity.x = 0;
+					engine.gravity.y = 1;
 				}
 			});
 

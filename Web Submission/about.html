@@ -7,16 +7,64 @@
 	<title>About this site</title>
 </head>
 <body>
+	<script src = "matter.js"></script>
 	<script type="text/javascript">
 		if (window.performance) {
-  			console.info("window.performance works fine on this browser");
-			}
-			console.info(performance.navigation.type);
 			if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
   				window.location.href = "index.html";
-			} else {
-  			console.info( "This page is not reloaded");
+  			}
+  		}
+
+  		class freqBar
+		{
+			constructor(id)
+			{
+				var leftX = ((1912/16) * (id-1)),
+					rightX = (1912/16) * id,
+					upY = 920,
+					downY = 1000,
+				 	position = Matter.Vertices.centre([ {x:leftX,y:upY} , {x:rightX,y:upY} , {x:rightX,y:downY} , {x:leftX,y:downY}]);
+				var body = Matter.Bodies.rectangle(position.x,position.y,119.5,80,{isStatic: true, collisionFilter: {group: 1}});
+				body.vertices = Matter.Vertices.create([ {x:leftX,y:upY} , {x:rightX,y:upY} , {x:rightX,y:downY} , {x:leftX,y:downY}], body);
+				return body;
 			}
+			
+			
+
+		}
+
+  		let engine = Matter.Engine.create();
+
+		let renderer = Matter.Render.create({
+			element: document.body,
+			engine:engine,
+			background:"#fffff",	
+		});
+		renderer.canvas.width = 1912;
+		renderer.canvas.height = 935;
+		//renderer.canvas.fillStyle = "#FFFFFF";
+		renderer.options.wireframes = false;
+		renderer.options.background = "#FFFFFF";
+
+		let mouse = Matter.Mouse.create(renderer.canvas);
+		let mouseConstraint = Matter.MouseConstraint.create(engine,{
+			mouse: mouse,
+			constraint: {
+				render: {visible: false}
+				}
+			});
+
+		let player = Matter.Bodies.circle(950,400,40,{id: 1, mass:10, collisionFilter: {group: 1}, render: {fillStyle: "Black"}});
+
+		const frequencyBars = [];
+		for (var i = 1; i < 17; i++) {
+			var bar = new freqBar(i);
+			frequencyBars.push(bar);
+		}
+		Matter.Composite.add(engine.world,[player, mouseConstraint]);
+		frequencyBars.forEach(element => Matter.Composite.add(engine.world, element));
+		Matter.Runner.run(engine);
+		Matter.Render.run(renderer);
 	</script>
 
 </body>

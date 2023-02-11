@@ -6824,6 +6824,30 @@ var Mouse = __webpack_require__(13);
                 }
 
                 c.globalAlpha = 1;
+                //text rendering, courtesy of this thread: https://github.com/liabru/matter-js/issues/321
+                if (part.render.text) 
+                {
+                    //default font size
+                    var fontsize = 30;
+                    //default font family
+                    var fontfamily = part.render.text.family || "Arial";
+                    //default text colour
+                    var color = part.render.text.color || "#FFFFFF";
+
+                    if (part.render.text.size) 
+                    {
+                        fontsize = part.render.text.size;
+                    }
+                    else if (part.circleRadius) 
+                    {
+                        fontsize = part.circleRadius/2;
+                    }
+                    c.textBaseline="middle";
+                    c.textAlign="center";
+                    c.fillStyle=color;
+                    c.font = fontsize+'px '+fontfamily;
+                    c.fillText(content, part.position.x, part.position.y);
+                }
             }
         }
     };
