@@ -2,29 +2,78 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="stylesheet" href="style.css">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>About this site</title>
+	<audio id="track" autoplay="false" preload="auto"><source src="password-infinity.mp3" type="audio/mpeg"></audio>
 </head>
 <body>
 	<script src = "matter.js"></script>
+	<script src = "matter-collision-events.js"></script>
 	<script type="text/javascript">
-		if (window.performance) {
-			if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
-  				window.location.href = "index.html";
+		Matter.use('matter-collision-events');
+
+		let audio = new Audio("password-infinity.mp3");
+  		const audioCtx = new AudioContext();
+  		console.log(audioCtx);
+  		let source;
+  		let analyser;
+
+  		document.addEventListener('click', function setup(){
+  			document.removeEventListener('click', setup);
+  			audio.play();
+  			source = audioCtx.createMediaElementSource(audio);
+  			analyser = audioCtx.createAnalyser();
+  			source.connect(analyser);
+  			analyser.connect(audioCtx.destination);
+  			analyser.fftSize = 64;
+  			const bufferLength = analyser.frequencyBinCount;
+  			const data = new Uint8Array(bufferLength);
+
+  			let barHeight;
+
+  			function animate()
+  			{
+  				analyser.getByteFrequencyData(data);
+
+  				for (var i = 0; i < bufferLength; i++) {
+  					barHeight = data[i];
+  					//frequencyBars[i].vertices[0].y = (255-barHeight) +690;
+  					//frequencyBars[i].vertices[1].y = (255-barHeight) +690;
+
+  					while(frequencyBars[i].vertices[0].y != ((255-barHeight) +690) )
+  					{
+  						if (frequencyBars[i].vertices[0].y > (255-barHeight) +690) 
+  						{
+  							frequencyBars[i].vertices[0].y -= 0.5;
+  							frequencyBars[i].vertices[1].y -= 0.5;
+  						}
+  						else
+  						{
+  							frequencyBars[i].vertices[0].y += 0.5;
+  							frequencyBars[i].vertices[1].y += 0.5;	
+  						}
+  					}
+  					
+  				}
+
+
+  				requestAnimationFrame(animate);
   			}
-  		}
+  			animate();
+  		});
 
   		class freqBar
 		{
 			constructor(id)
 			{
-				var leftX = ((1912/16) * (id-1)),
-					rightX = (1912/16) * id,
+				var leftX = ((1912/32) * (id-1)),
+					rightX = (1912/32) * id,
 					upY = 920,
 					downY = 1000,
 				 	position = Matter.Vertices.centre([ {x:leftX,y:upY} , {x:rightX,y:upY} , {x:rightX,y:downY} , {x:leftX,y:downY}]);
-				var body = Matter.Bodies.rectangle(position.x,position.y,119.5,80,{isStatic: true, collisionFilter: {group: 1}});
+				var body = Matter.Bodies.rectangle(position.x,position.y,119.5,40,{isStatic: true, collisionFilter: {group: 1}});
 				body.vertices = Matter.Vertices.create([ {x:leftX,y:upY} , {x:rightX,y:upY} , {x:rightX,y:downY} , {x:leftX,y:downY}], body);
 				return body;
 			}
@@ -34,7 +83,6 @@
 		}
 
   		let engine = Matter.Engine.create();
-
 		let renderer = Matter.Render.create({
 			element: document.body,
 			engine:engine,
@@ -55,12 +103,22 @@
 			});
 
 		let player = Matter.Bodies.circle(950,400,40,{id: 1, mass:10, collisionFilter: {group: 1}, render: {fillStyle: "Black"}});
+		player.onCollide(function(){
+			
+		})
 
 		const frequencyBars = [];
-		for (var i = 1; i < 17; i++) {
+		for (var i = 1; i < 33; i++) {
 			var bar = new freqBar(i);
 			frequencyBars.push(bar);
 		}
+
+		Matter.Events.on(engine, 'beforeUpdate', function(){
+			//console.log(player.position);
+		});
+
+		
+
 		Matter.Composite.add(engine.world,[player, mouseConstraint]);
 		frequencyBars.forEach(element => Matter.Composite.add(engine.world, element));
 		Matter.Runner.run(engine);
