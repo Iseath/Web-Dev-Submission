@@ -19,6 +19,7 @@
   		console.log(audioCtx);
   		let source;
   		let analyser;
+  		let frame=0;
 
   		document.addEventListener('click', function setup(){
   			document.removeEventListener('click', setup);
@@ -30,18 +31,43 @@
   			analyser.fftSize = 64;
   			const bufferLength = analyser.frequencyBinCount;
   			const data = new Uint8Array(bufferLength);
+  			const waveform = new Uint8Array(bufferLength);
 
   			let barHeight;
+  			function getRndInteger(min, max) 
+  			{
+  				return Math.floor(Math.random() * (max - min) ) + min;
+			}
+
+  			function getAvg(arr)
+  			{
+  				let sum = 0;
+  				for (var i = 0; i < arr.length; i++) {
+  					sum += arr[i];
+  				}
+  				return sum/arr.length;
+  			}
 
   			function animate()
   			{
+  				frame+=1;
   				analyser.getByteFrequencyData(data);
 
+  				analyser.getByteTimeDomainData(waveform);
+  				waveformAverage = getAvg(waveform);
+  				
   				for (var i = 0; i < bufferLength; i++) {
   					barHeight = data[i];
   					//frequencyBars[i].vertices[0].y = (255-barHeight) +690;
   					//frequencyBars[i].vertices[1].y = (255-barHeight) +690;
-
+  					if (frame%64 == 0) 
+  					{
+  						renderer.options.background = `rgb(${getRndInteger(160,waveformAverage)}, ${getRndInteger(150,waveformAverage)}, ${getRndInteger(130,waveformAverage)},1)`;
+  						document.body.style.background= renderer.options.background;
+  						frequencyBars[i].render.fillStyle= `rgb(${waveformAverage}, ${waveformAverage}, ${waveformAverage})`;
+  						player.render.fillStyle= `rgb(${waveformAverage-90}, ${waveformAverage-90}, ${waveformAverage-90})`;
+  					}
+  					
   					while(frequencyBars[i].vertices[0].y != ((255-barHeight) +690) )
   					{
   						if (frequencyBars[i].vertices[0].y > (255-barHeight) +690) 
